@@ -1,60 +1,65 @@
 <!--
-  If there's not enough space in the first row, create a separate label row. We mark this row as
-  aria-hidden because we don't want it to be read out as one of the weeks in the month.
+If there's not enough space in the first row, create a separate label row. We mark this row as
+aria-hidden because we don't want it to be read out as one of the weeks in the month.
 -->
 @if (!hideLabel) {
-  <tr *ngIf="_firstRowOffset < labelMinRequiredCells" aria-hidden="true">
-    <td class="mat-calendar-body-label"
+  @if (_firstRowOffset < labelMinRequiredCells) {
+    <tr aria-hidden="true">
+      <td class="mat-calendar-body-label"
         [attr.colspan]="numCols"
         [style.paddingTop]="_cellPadding"
         [style.paddingBottom]="_cellPadding">
-      {{label}}
-    </td>
-  </tr>
+        {{label}}
+      </td>
+    </tr>
+  }
 }
 
 <!-- Create the first row separately so we can include a special spacer cell. -->
-<tr *ngFor="let row of rows; let rowIndex = index" role="row">
-  @if (row[0].isWeekNumber) {
-    <th
-      class="mat-calendar-body-week-number"
-      [style.width]="_cellWidth"
-      [style.paddingTop]="_cellPadding"
-      [style.paddingBottom]="_cellPadding"
-    >
-      {{ row[0].displayValue }}
-    </th>
-  }
-  <!--
+@for (row of rows; track row; let rowIndex = $index) {
+  <tr role="row">
+    @if (row[0].isWeekNumber) {
+      <th
+        class="mat-calendar-body-week-number"
+        [style.width]="_cellWidth"
+        [style.paddingTop]="_cellPadding"
+        [style.paddingBottom]="_cellPadding"
+        >
+        {{ row[0].displayValue }}
+      </th>
+    }
+    <!--
     This cell is purely decorative, but we can't put `aria-hidden` or `role="presentation"` on it,
     because it throws off the week days for the rest of the row on NVDA. The aspect ratio of the
     table cells is maintained by setting the top and bottom padding as a percentage of the width
     (a variant of the trick described here: https://www.w3schools.com/howto/howto_css_aspect_ratio.asp).
-  -->
-  <td *ngIf="rowIndex === 0 && _firstRowOffset"
-      class="mat-calendar-body-label"
-      [attr.colspan]="_firstRowOffset"
-      [style.paddingTop]="_cellPadding"
-      [style.paddingBottom]="_cellPadding">
-    {{(_firstRowOffset >= labelMinRequiredCells && !hideLabel) ? label : ''}}
-  </td>
-  <!--
+    -->
+    @if (rowIndex === 0 && _firstRowOffset) {
+      <td
+        class="mat-calendar-body-label"
+        [attr.colspan]="_firstRowOffset"
+        [style.paddingTop]="_cellPadding"
+        [style.paddingBottom]="_cellPadding">
+        {{(_firstRowOffset >= labelMinRequiredCells && !hideLabel) ? label : ''}}
+      </td>
+    }
+    <!--
     Each gridcell in the calendar contains a button, which signals to assistive technology that the
     cell is interactable, as well as the selection state via `aria-pressed`. See #23476 for
     background.
-  -->
-  <ng-container *ngFor="let item of row; let colIndex = index">
-    @if (!item.isWeekNumber) {
-      <td
-        role="gridcell"
-        class="mat-calendar-body-cell-container"
-        [style.width]="_cellWidth"
-        [style.paddingTop]="_cellPadding"
-        [style.paddingBottom]="_cellPadding"
-        [attr.data-mat-row]="rowIndex"
-        [attr.data-mat-col]="colIndex"
-      >
-        <button
+    -->
+    @for (item of row; track item; let colIndex = $index) {
+      @if (!item.isWeekNumber) {
+        <td
+          role="gridcell"
+          class="mat-calendar-body-cell-container"
+          [style.width]="_cellWidth"
+          [style.paddingTop]="_cellPadding"
+          [style.paddingBottom]="_cellPadding"
+          [attr.data-mat-row]="rowIndex"
+          [attr.data-mat-col]="colIndex"
+          >
+          <button
             type="button"
             class="mat-calendar-body-cell"
             [ngClass]="item.cssClasses"
@@ -86,11 +91,12 @@
               {{item.displayValue}}
             </span>
             <span class="mat-calendar-body-cell-preview" aria-hidden="true"></span>
-        </button>
-      </td>
+          </button>
+        </td>
+      }
     }
-  </ng-container>
-</tr>
+  </tr>
+}
 
 <label [id]="_startDateLabelId" class="mat-calendar-body-hidden-label">
   {{startDateAccessibleName}}
