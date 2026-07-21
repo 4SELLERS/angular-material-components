@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, forwardRef, Input, OnChanges, OnInit, Optional, SimpleChanges, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, Input, OnChanges, OnInit, Optional, SimpleChanges, TemplateRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { Subject } from 'rxjs';
@@ -42,6 +42,8 @@ export class NgxMatTimepickerComponent<D> implements ControlValueAccessor, OnIni
   @Input() enableMeridian = false;
   @Input() defaultTime: number[];
   @Input() color: ThemePalette = 'primary';
+  @Input() arrowUpIconTemplate: TemplateRef<unknown>;
+  @Input() arrowDownIconTemplate: TemplateRef<unknown>;
 
   public meridian: string = MERIDIANS.AM;
 
